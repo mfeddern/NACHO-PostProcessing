@@ -26,9 +26,9 @@ TYR <- 3.24
 THR <- -1.46
 
 #Reading in the .csv of the NACHO data file and setting the file name for your output file
-data.1 <- SL.1 <- read.csv("Data/Clean/TODO/20200127_Feddern_CSIA.csv") #modify with name of your data file
+data.1 <- SL.2 <- read.csv("Data/Clean/TODO/20200623_Feddern_CSIA.csv") #modify with name of your data file
 colnames(data.1)<-name
-file.name <- "Data/Processed/SL.1.csv" #file name for output file including relative file path
+file.name <- "Data/Processed/SL.4.csv" #file name for output file including relative file path
 
 ###### Linear Model for Drift Correction #####
 #Fit a linear model to your external standards with "Analysis" (injection number) as the dependent variable and 
@@ -115,45 +115,63 @@ data <- cbind(data.1, adj)
 #omitting the conditioning injections
 
 mean <- aggregate(data['adj'], by = list(data$ID1, data$AAID), mean)
-#names.means should be in the same order as the "AA" oject to make sure they are correctly ordered based on the order of the loop
-#if they are not correctly ordered reorder names.meanss accordingly
-names.means<- c("Sample.ID","ALA.mean", "ASP.mean", "GLU.mean", "ILE.mean", "LEU.mean", "NLE.mean", "PHE.mean", "PRO.mean", "SER.mean", "TYR.mean", "VAL.mean")
-meanfull<-data.frame(matrix(0, nrow = length(unique(mean$Group.1)), ncol = length(AA)+1)) #initiate a dataframe for the intercepts of the linear model
-meanfull[,1]<-mean%>%
-  filter(Group.2  == AA[3])
-for(i in 1:length(AA)){
-  meanfull[1:length(unique(mean$Group.1)),i+1]<- mean%>%
-  filter(Group.2  == AA[i])%>%
-  select(adj)
-}
-colnames(meanfull)<- names.means
-meanfull #ALWAYS check to make sure everything looks right! small errors can break the code
+data.mean<- data.frame(subset(mean, Group.2==AA[1]))
+data.mean<-data.mean %>% 
+  full_join(data.frame(subset(mean, Group.2==AA[2])), by = "Group.1")%>% 
+  rename(ALA.mean=adj.x, ASP.mean=adj.y)%>%
+  full_join( data.frame(subset(mean, Group.2==AA[3])), by = "Group.1")%>%
+  rename(GLU.mean=adj)%>%
+  full_join(data.frame(subset(mean, Group.2==AA[4])), by = "Group.1")%>%
+  rename(GLY.mean=adj)%>%
+  full_join( data.frame(subset(mean, Group.2==AA[5])), by = "Group.1")%>% 
+  rename(ILE.mean=adj)%>%
+  full_join( data.frame(subset(mean, Group.2==AA[6])), by = "Group.1")%>% 
+  rename(NLE.mean=adj)%>%
+  full_join( data.frame(subset(mean, Group.2==AA[7])), by = "Group.1")%>% 
+  rename(PHE.mean=adj)%>%
+  full_join( data.frame(subset(mean, Group.2==AA[8])), by = "Group.1")%>%
+  rename(PRO.mean=adj)%>%
+  full_join( data.frame(subset(mean, Group.2==AA[9])), by = "Group.1")%>% 
+  rename(SER.mean=adj)%>%
+  full_join( data.frame(subset(mean, Group.2==AA[10])), by = "Group.1")%>%
+  rename(THR.mean=adj)%>%
+  full_join( data.frame(subset(mean, Group.2==AA[11])), by = "Group.1")%>% 
+  rename(TYR.mean=adj)%>%
+  full_join( data.frame(subset(mean, Group.2==AA[12])), by = "Group.1")%>%
+  rename(VAL.mean=adj, Sample.ID=Group.1) %>%
+  select(Sample.ID, ALA.mean, ASP.mean, GLU.mean, GLY.mean, ILE.mean, NLE.mean, PHE.mean, PRO.mean, SER.mean, THR.mean, TYR.mean, VAL.mean)
+data.mean
 
 
-meanfull<-data.frame(matrix(0, nrow = length(unique(mean$Group.1)), ncol = length(AA)+1)) #initiate a dataframe for the intercepts of the linear model
-meanfull[,1]<-mean%>%
-  filter(Group.2  == AA[3])
-colnames(meanfull)<- names.means
+sd <- aggregate(data['adj'], by = list(data$ID1, data$AAID), sd)
+data.sd<- data.frame(subset(sd, Group.2==AA[1]))
+data.sd<-data.sd %>% 
+  full_join(data.frame(subset(sd, Group.2==AA[2])), by = "Group.1")%>% 
+  rename(ALA.sd=adj.x, ASP.sd=adj.y)%>%
+  full_join( data.frame(subset(sd, Group.2==AA[3])), by = "Group.1")%>%
+  rename(GLU.sd=adj)%>%
+  full_join(data.frame(subset(sd, Group.2==AA[4])), by = "Group.1")%>%
+  rename(GLY.sd=adj)%>%
+  full_join( data.frame(subset(sd, Group.2==AA[5])), by = "Group.1")%>% 
+  rename(ILE.sd=adj)%>%
+  full_join( data.frame(subset(sd, Group.2==AA[6])), by = "Group.1")%>% 
+  rename(NLE.sd=adj)%>%
+  full_join( data.frame(subset(sd, Group.2==AA[7])), by = "Group.1")%>% 
+  rename(PHE.sd=adj)%>%
+  full_join( data.frame(subset(sd, Group.2==AA[8])), by = "Group.1")%>%
+  rename(PRO.sd=adj)%>%
+  full_join( data.frame(subset(sd, Group.2==AA[9])), by = "Group.1")%>% 
+  rename(SER.sd=adj)%>%
+  full_join( data.frame(subset(sd, Group.2==AA[10])), by = "Group.1")%>%
+  rename(THR.sd=adj)%>%
+  full_join( data.frame(subset(sd, Group.2==AA[11])), by = "Group.1")%>% 
+  rename(TYR.sd=adj)%>%
+  full_join( data.frame(subset(sd, Group.2==AA[12])), by = "Group.1")%>%
+  rename(VAL.sd=adj, Sample.ID=Group.1) %>%
+  select(Sample.ID, ALA.sd, ASP.sd, GLU.sd, GLY.sd, ILE.sd, NLE.sd, PHE.sd, PRO.sd, SER.sd, THR.sd, TYR.sd, VAL.sd)
+data.sd
 
-subset<-function(dataframe, AA) {
-  data.frame(subset(data.1, AAID==AA))
-}
-
-
-sd<- aggregate(data['adj'], by = list(data$ID1, data$AAID), sd)
-  #names.sds should be in the same order as the "AA" oject to make sure they are correctly ordered based on the order of the loop
-  #if they are not correctly ordered reorder names.sds accordingly
-names.sds<- c("Sample.ID","ALA.sd", "ASP.sd", "GLU.sd", "ILE.sd", "LEU.sd", "NLE.sd", "PHE.sd", "PRO.sd", "SER.sd", "TYR.sd", "VAL.sd")
-sdfull<-data.frame(matrix(0, nrow = length(unique(sd$Group.1)), ncol = length(AA)+1)) #initiate a dataframe for the intercepts of the linear model
-sdfull[,1]<-sd%>%
-  filter(Group.2  == AA[1])
-for(i in 1:length(AA)){
-  sdfull[1:length(unique(sd$Group.1)),i+1]<- sd%>%
-    filter(Group.2  == AA[i])%>%
-    select(adj)
-}
-colnames(sdfull)<- names.sds 
-Corrected <- merge(meanfull,sdfull, by="Sample.ID") #this merges the columns in both the SD and mean dataframes
+Corrected <- merge(data.mean, data.sd, by="Sample.ID", all.x=TRUE) #this merges the columns in both the SD and mean dataframes
 
 write.csv(Corrected, file = file.name)
 
