@@ -129,6 +129,17 @@ for(i in 1:length(AA)){
 colnames(meanfull)<- names.means
 meanfull #ALWAYS check to make sure everything looks right! small errors can break the code
 
+
+meanfull<-data.frame(matrix(0, nrow = length(unique(mean$Group.1)), ncol = length(AA)+1)) #initiate a dataframe for the intercepts of the linear model
+meanfull[,1]<-mean%>%
+  filter(Group.2  == AA[3])
+colnames(meanfull)<- names.means
+
+subset<-function(dataframe, AA) {
+  data.frame(subset(data.1, AAID==AA))
+}
+
+
 sd<- aggregate(data['adj'], by = list(data$ID1, data$AAID), sd)
   #names.sds should be in the same order as the "AA" oject to make sure they are correctly ordered based on the order of the loop
   #if they are not correctly ordered reorder names.sds accordingly
